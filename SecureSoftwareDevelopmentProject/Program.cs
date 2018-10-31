@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 /*****************************************
  * File Author: Jamie Higgins
  * File Created: 17/09/2018
- * File Last Modified: 30/10/2018
+ * File Last Modified: 31/10/2018
  ****************************************/
 
 namespace SecureSoftwareDevelopmentProject
@@ -27,33 +27,33 @@ namespace SecureSoftwareDevelopmentProject
             do
             {
                 // Main menu for the application
-                Console.WriteLine("\nWhat would you like to do?:\n" +
+                Console.Write("\nWhat would you like to do?:\n" +
                     "1. View All Data\n" +
                     "2. Add New Products\n" +
                     "3. Update a Product\n" +
                     "4. Delete a Product\n" +
                     "5. Save Changes\n" +
                     "6. Exit\n\n" +
-                    "Your choice:");
+                    "Your choice: ");
                 choice = Console.ReadLine();
 
                 switch (choice)
                 {
                     case "1":
                         ViewAllData(inputList);
-                        Console.Write("Press any key to return to the main menu");
+                        Console.Write("Press any key to return to the main menu.");
                         break;
                     case "2":
-                        AddNewProduct();
-                        Console.Write("Press any key to return to the main menu");
+                        AddNewProduct(inputList);
+                        Console.Write("Press any key to return to the main menu.");
                         break;
                     case "3":
                         UpdateProduct(inputList);
-                        Console.Write("Press any key to return to the main menu");
+                        Console.Write("Press any key to return to the main menu.");
                         break;
                     case "4":
                         DeleteItem(inputList);
-                        Console.Write("Press any key to return to the main menu");
+                        Console.Write("Press any key to return to the main menu.");
                         break;
                     case "5":
                         SaveChanges(inputList);
@@ -74,11 +74,11 @@ namespace SecureSoftwareDevelopmentProject
         /// <summary>
         /// Add a new product to the application
         /// </summary>
-        private static void AddNewProduct()
+        private static void AddNewProduct(List<Item> inputList)
         {
             bool isPriceValid;
             Console.Write("\nWhat is the name of the product?: ");
-            var product = Console.ReadLine();
+            var product = Console.ReadLine();            
 
             do
             {
@@ -89,9 +89,11 @@ namespace SecureSoftwareDevelopmentProject
 
                 if (isPriceValid)
                 {
+                    Item newProduct = new Item(product, Convert.ToInt32(price), DateTime.Now);
+                    inputList.Add(newProduct);
                     using (StreamWriter file = new StreamWriter(@"Data.txt", true))
                     {
-                        file.WriteLine($"{product},{price}");
+                        file.WriteLine();
                     }
                 }
                 else
@@ -99,6 +101,8 @@ namespace SecureSoftwareDevelopmentProject
                     Console.Write("Price is not valid. Please try again.");
                 }
             } while (!isPriceValid);
+
+            SaveChanges(inputList);
         }
 
         /// <summary>
@@ -106,11 +110,19 @@ namespace SecureSoftwareDevelopmentProject
         /// </summary>
         private static void ViewAllData(List<Item> inputList)
         {
-            foreach (var item in inputList)
+            if (inputList.Count != 0)
             {
-                // TODO: Redo this as a table
-                Console.WriteLine($"\tProduct: {item.ItemName}\n" +
-                                    $"\tPrice: {item.Price}\n");
+                foreach (var item in inputList)
+                {
+                    // TODO: Redo this as a table
+                    Console.WriteLine($"\tProduct: {item.ItemName}\n" +
+                                        $"\tPrice: {item.Price}\n" +
+                                        $"\tDate Added: {item.Date}");
+                }
+            }
+            else
+            {
+                Console.WriteLine("No items are currently in the till, try adding some.");
             }
         }
 
@@ -123,7 +135,7 @@ namespace SecureSoftwareDevelopmentProject
                 while ((line = reader.ReadLine()) != null)
                 {
                     string[] words = line.Split(',');
-                    inputList.Add(new Item(words[0], Convert.ToDecimal(words[1])));
+                    inputList.Add(new Item(words[0], Convert.ToDecimal(words[1]), DateTime.Now));
                 }
             }
 
@@ -136,19 +148,20 @@ namespace SecureSoftwareDevelopmentProject
         private static void UpdateProduct(List<Item> inputList)
         {
             bool isPriceValid;
-            Console.WriteLine("Which file would you like to update?");
+            Console.WriteLine("Which product would you like to update?");
 
             for (int i = 0; i < inputList.Count; i++)
             {
                 Console.WriteLine($"{i + 1}: {inputList[i].ItemName}");
             }
 
-            var product = Console.ReadLine();
+            Console.Write("Your choice: ");
+            var productIndex = Convert.ToInt32(Console.ReadLine()) - 1;
 
             do
             {
                 Console.Write("What is the name of the product?: ");
-                product = Console.ReadLine();
+                var product = Console.ReadLine();
                 Console.Write("How much is the product?: ");
                 var price = Console.ReadLine();
                 // Validate that the input for the price is in the correct format. eg. "€12.34"
@@ -157,6 +170,13 @@ namespace SecureSoftwareDevelopmentProject
                 if (isPriceValid)
                 {
                     // TODO: Finish this
+                    for (int i = 0; i < inputList.Count; i++)
+                    {
+                        if (i == productIndex)
+                        {
+                            inputList[i] = new Item(product, Convert.ToInt32(price), DateTime.Now);
+                        }
+                    }
                 }
                 else
                 {
@@ -188,7 +208,7 @@ namespace SecureSoftwareDevelopmentProject
             {
                 foreach (var item in inputList)
                 {
-                    writer.WriteLine($"{item.ItemName},{item.Price}");
+                    writer.WriteLine($"{item.ItemName},{item.Price},{DateTime.Now}");
                 }
                 Console.WriteLine("Changes Saved. Press any key to return to the main menu.");
             }

@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SecureSoftwareDevelopmentProject
 {
@@ -10,11 +6,13 @@ namespace SecureSoftwareDevelopmentProject
     {
         public string ItemName { get; set; }
         public decimal Price { get; set; }
+        public DateTime Date { get; set; }
 
-        public Item(string itemName, decimal price)
+        public Item(string itemName, decimal price, DateTime date)
         {
             ItemName = itemName;
             Price = price;
+            Date = date;
         }
     }
 }
