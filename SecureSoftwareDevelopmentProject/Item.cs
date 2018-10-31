@@ -1,5 +1,11 @@
 ﻿using System;
 
+/*****************************************
+ * File Author: Jamie Higgins
+ * File Created: 30/09/2018
+ * File Last Modified: 31/10/2018
+ ****************************************/
+
 namespace SecureSoftwareDevelopmentProject
 {
     class Item

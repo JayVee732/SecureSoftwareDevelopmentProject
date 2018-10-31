@@ -3,6 +3,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 
+/*****************************************
+ * File Author: Jamie Higgins
+ * File Created: 31/09/2018
+ * File Last Modified: 31/10/2018
+ ****************************************/
+
 namespace SecureSoftwareDevelopmentProject
 {
     class Connection
@@ -13,6 +19,7 @@ namespace SecureSoftwareDevelopmentProject
         /// <param name="inputList">The list imported from StoreData()</param>
         public static void SaveChanges(List<Item> inputList)
         {
+            Console.WriteLine("----------------------------------------------------");
             using (StreamWriter writer = new StreamWriter(@"Data.txt"))
             {
                 foreach (var item in inputList)
@@ -29,17 +36,25 @@ namespace SecureSoftwareDevelopmentProject
         /// <returns>The full list of items from the text file "Data.txt"</returns>
         public static List<Item> StoreData()
         {
-            List<Item> inputList = new List<Item>();
-            using (StreamReader reader = File.OpenText(@"Data.txt"))
+            try
             {
-                string line = string.Empty;
-                while ((line = reader.ReadLine()) != null)
+                List<Item> inputList = new List<Item>();
+                using (StreamReader reader = File.OpenText(@"Data.txt"))
                 {
-                    string[] words = line.Split(',');
-                    inputList.Add(new Item(words[0], Convert.ToDecimal(words[1]), DateTime.Now));
+                    string line = string.Empty;
+                    while ((line = reader.ReadLine()) != null)
+                    {
+                        // Read each line in and add it to the List
+                        string[] itemInfo = line.Split(',');
+                        inputList.Add(new Item(itemInfo[0], Convert.ToDecimal(itemInfo[1]), Convert.ToDateTime(itemInfo[2])));
+                    }
                 }
+                return inputList;
             }
-            return inputList;
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
         /// <summary>
@@ -61,6 +76,7 @@ namespace SecureSoftwareDevelopmentProject
                     Item productObj = new Item(product, Convert.ToDecimal(price), DateTime.Now);
                     if (isPriceValid)
                     {
+                        // Add new product or update existing
                         if (addOrUpdate)
                         {
                             AddItemToFile(inputList, productObj);
@@ -96,6 +112,7 @@ namespace SecureSoftwareDevelopmentProject
             {
                 if (i == productIndex)
                 {
+                    // Update product based on index in List
                     inputList[i] = productObj;
                 }
             }
@@ -123,7 +140,7 @@ namespace SecureSoftwareDevelopmentProject
         /// <param name="price">price of the product</param>
         private static void ValidateProduct(out bool isPriceValid, out string product, out string price)
         {
-            Console.Write("\nWhat is the name of the product?: ");
+            Console.Write("----------------------------------------------------\nWhat is the name of the product?: ");
             product = Console.ReadLine();
             Console.Write("How much is the product?: ");
             price = Console.ReadLine();
@@ -138,15 +155,17 @@ namespace SecureSoftwareDevelopmentProject
         public static void DeleteItem(List<Item> inputList)
         {
             int productNumber;
-            Console.WriteLine("\nWhich item would you like to delete?: ");
+            Console.WriteLine("Which item would you like to delete?");
 
             for (int i = 0; i < inputList.Count; i++)
             {
                 Console.WriteLine($"{i + 1}: {inputList[i].ItemName}");
             }
 
+            Console.Write("Your choice: ");
             productNumber = Convert.ToInt32(Console.ReadLine());
 
+            // Remove item based on index
             inputList.RemoveAt(productNumber - 1);
             productNumber = 0;
             SaveChanges(inputList);

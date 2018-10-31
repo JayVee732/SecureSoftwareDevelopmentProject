@@ -18,7 +18,7 @@ namespace SecureSoftwareDevelopmentProject
         {
             List<Item> inputList = Connection.StoreData();
 
-            Console.WriteLine("Money Machine Totals");
+            Console.WriteLine("Data in Till Machine\n");
             MainMenu(inputList);
         }
 
@@ -27,10 +27,9 @@ namespace SecureSoftwareDevelopmentProject
             string choice;
             do
             {
-                // Main menu for the application
-                Console.Write("\nWhat would you like to do?:\n" +
+                Console.Write("What would you like to do?:\n" +
                     "1. View All Data\n" +
-                    "2. Add New Products\n" +
+                    "2. Add New Product\n" +
                     "3. Update a Product\n" +
                     "4. Delete a Product\n" +
                     "5. Exit\n\n" +
@@ -40,19 +39,28 @@ namespace SecureSoftwareDevelopmentProject
                 switch (choice)
                 {
                     case "1":
+                        Console.Clear();
+                        Console.WriteLine("View All Data\n----------------------------------------------------");
                         ViewAllData(inputList);
                         break;
                     case "2":
+                        Console.Clear();
+                        Console.WriteLine("Add New Product");
                         Connection.AddOrUpdate(inputList, true, null);
                         break;
                     case "3":
+                        Console.Clear();
+                        Console.WriteLine("Update a Product\n----------------------------------------------------");
                         GetUpdateProductIndex(inputList);
                         break;
                     case "4":
+                        Console.Clear();
+                        Console.WriteLine("Delete a Product\n----------------------------------------------------");
                         Connection.DeleteItem(inputList);
                         break;
                     case "5":
-                        Console.Write("Press any key to exit the application.");
+                        Console.Clear();
+                        Console.WriteLine("Exit\n----------------------------------------------------\nPress any key to exit the application.");
                         break;
                     default:
                         Console.Write("Not a valid input. Press any key to return to the main menu.\n");
@@ -60,6 +68,7 @@ namespace SecureSoftwareDevelopmentProject
                 }
 
                 Console.ReadLine();
+                Console.Clear();
             } while (choice != "5"); // User exits the application
         }
 
@@ -71,18 +80,16 @@ namespace SecureSoftwareDevelopmentProject
         {
             if (inputList.Count != 0)
             {
+                Console.WriteLine($"|{"Product",10}|{"Price",10}|{"Date",25}|\n----------------------------------------------------");
                 foreach (var item in inputList)
                 {
-                    // TODO: Redo this as a table
-                    Console.WriteLine($"\tProduct: {item.ItemName}\n" +
-                                        $"\tPrice: {item.Price}\n" +
-                                        $"\tDate Added: {item.Date}");
+                    Console.WriteLine($"|{item.ItemName,10}|{item.Price,10}|{item.Date,25}|");
                 }
-                Console.WriteLine("Press any key to return to the main menu.");
+                Console.WriteLine("----------------------------------------------------\nPress any key to return to the main menu.");
             }
             else
             {
-                Console.WriteLine("No items are currently in the till, try adding some.");
+                Console.WriteLine("----------------------------------------------------\nNo items are currently in the till, try adding some.");
             }
         }
 
