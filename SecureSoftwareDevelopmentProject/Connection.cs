@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 /*****************************************
  * File Author: Jamie Higgins
  * File Created: 31/09/2018
- * File Last Modified: 31/10/2018
+ * File Last Modified: 03/11/2018
  ****************************************/
 
 namespace SecureSoftwareDevelopmentProject
@@ -19,14 +19,21 @@ namespace SecureSoftwareDevelopmentProject
         /// <param name="inputList">The list imported from StoreData()</param>
         public static void SaveChanges(List<Item> inputList)
         {
-            Console.WriteLine("----------------------------------------------------");
-            using (StreamWriter writer = new StreamWriter(@"Data.txt"))
+            try
             {
-                foreach (var item in inputList)
+                Console.WriteLine("----------------------------------------------------");
+                using (StreamWriter writer = new StreamWriter(@"Data.txt"))
                 {
-                    writer.WriteLine($"{item.ItemName},{item.Price},{item.Date}");
+                    foreach (var item in inputList)
+                    {
+                        writer.WriteLine($"{item.ItemName},{item.Price},{item.Date}");
+                    }
+                    Console.WriteLine("Changes Saved. Press any key to return to the main menu.");
                 }
-                Console.WriteLine("Changes Saved. Press any key to return to the main menu.");
+            }
+            catch (IOException ioe)
+            {
+                Console.WriteLine($"Error: {ioe}");
             }
         }
 
@@ -38,6 +45,8 @@ namespace SecureSoftwareDevelopmentProject
         {
             try
             {
+                CreateFile();
+
                 List<Item> inputList = new List<Item>();
                 using (StreamReader reader = File.OpenText(@"Data.txt"))
                 {
@@ -54,6 +63,17 @@ namespace SecureSoftwareDevelopmentProject
             catch (Exception)
             {
                 throw;
+            }
+        }
+
+        /// <summary>
+        /// Create the text file if it doesn't already exist
+        /// </summary>
+        private static void CreateFile()
+        {
+            if (!File.Exists(@"Data.txt"))
+            {
+                using (var stream = File.Create(@"Data.txt")) { }
             }
         }
 
@@ -167,6 +187,7 @@ namespace SecureSoftwareDevelopmentProject
 
             // Remove item based on index
             inputList.RemoveAt(productNumber - 1);
+            // Resets the variable for next use
             productNumber = 0;
             SaveChanges(inputList);
         }
