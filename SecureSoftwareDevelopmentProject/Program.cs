@@ -4,7 +4,7 @@ using System.Collections.Generic;
 /*****************************************
  * File Author: Jamie Higgins
  * File Created: 17/09/2018
- * File Last Modified: 31/10/2018
+ * File Last Modified: 03/11/2018
  ****************************************/
 
 namespace SecureSoftwareDevelopmentProject
@@ -12,16 +12,21 @@ namespace SecureSoftwareDevelopmentProject
     class Program
     {
         /// <summary>
-        /// Main method for the applcation
+        /// Main method and entry point for the applcation
         /// </summary>
         static void Main()
         {
+            // The application first grabs all of the data from the text file and stores it in a List
             List<Item> inputList = Connection.StoreData();
 
             Console.WriteLine("Data in Till Machine\n");
             MainMenu(inputList);
         }
 
+        /// <summary>
+        /// Displays a menu where the user and choose what option they would like to perform
+        /// </summary>
+        /// <param name="inputList">The list imported from StoreData()</param>
         private static void MainMenu(List<Item> inputList)
         {
             string choice;
@@ -89,7 +94,7 @@ namespace SecureSoftwareDevelopmentProject
             }
             else
             {
-                Console.WriteLine("----------------------------------------------------\nNo items are currently in the till, try adding some.");
+                Console.WriteLine("No items are currently in the till, try adding some.");
             }
         }
 
