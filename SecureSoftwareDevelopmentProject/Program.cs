@@ -4,7 +4,7 @@ using System.Collections.Generic;
 /*****************************************
  * File Author: Jamie Higgins
  * File Created: 17/09/2018
- * File Last Modified: 03/11/2018
+ * File Last Modified: 19/12/2018
  ****************************************/
 
 namespace SecureSoftwareDevelopmentProject
@@ -61,7 +61,7 @@ namespace SecureSoftwareDevelopmentProject
                     case "4":
                         Console.Clear();
                         Console.WriteLine("Delete a Product\n----------------------------------------------------");
-                        Connection.DeleteItem(inputList);
+                        CRUD.DeleteItem(inputList);
                         break;
                     case "5":
                         Console.Clear();

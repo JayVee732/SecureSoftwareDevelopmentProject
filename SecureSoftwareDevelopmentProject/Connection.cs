@@ -1,41 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 
 /*****************************************
  * File Author: Jamie Higgins
  * File Created: 31/09/2018
- * File Last Modified: 03/11/2018
+ * File Last Modified: 19/12/2018
  ****************************************/
 
 namespace SecureSoftwareDevelopmentProject
 {
     class Connection
     {
-        /// <summary>
-        /// Save changes made to list of products to text file
-        /// </summary>
-        /// <param name="inputList">The list imported from StoreData()</param>
-        public static void SaveChanges(List<Item> inputList)
-        {
-            try
-            {
-                Console.WriteLine("----------------------------------------------------");
-                using (StreamWriter writer = new StreamWriter(@"Data.txt"))
-                {
-                    foreach (var item in inputList)
-                    {
-                        writer.WriteLine($"{item.ItemName},{item.Price},{item.Date}");
-                    }
-                    Console.WriteLine("Changes Saved. Press any key to return to the main menu.");
-                }
-            }
-            catch (IOException ioe)
-            {
-                Console.WriteLine($"Error: {ioe}");
-            }
-        }
+        private static string fileLocation = @"Data.txt";
 
         /// <summary>
         /// Get the product from the text file
@@ -48,7 +27,7 @@ namespace SecureSoftwareDevelopmentProject
                 CreateFile();
 
                 List<Item> inputList = new List<Item>();
-                using (StreamReader reader = File.OpenText(@"Data.txt"))
+                using (StreamReader reader = File.OpenText(fileLocation))
                 {
                     string line = string.Empty;
                     while ((line = reader.ReadLine()) != null)
@@ -71,9 +50,9 @@ namespace SecureSoftwareDevelopmentProject
         /// </summary>
         private static void CreateFile()
         {
-            if (!File.Exists(@"Data.txt"))
+            if (!File.Exists(fileLocation))
             {
-                using (var stream = File.Create(@"Data.txt")) { }
+                using (var stream = File.Create(fileLocation)) { }
             }
         }
 
@@ -99,11 +78,11 @@ namespace SecureSoftwareDevelopmentProject
                         // Add new product or update existing
                         if (addOrUpdate)
                         {
-                            AddItemToFile(inputList, productObj);
+                            CRUD.AddItemToFile(inputList, productObj);
                         }
                         else
                         {
-                            UpdateItemInFile(inputList, productIndex, productObj);
+                            CRUD.UpdateItemInFile(inputList, productIndex, productObj);
                         }
                     }
                     else
@@ -112,43 +91,11 @@ namespace SecureSoftwareDevelopmentProject
                     }
                 } while (!isPriceValid);
 
-                SaveChanges(inputList);
+                CRUD.SaveChanges(inputList);
             }
             catch (Exception)
             {
                 throw;
-            }
-        }
-
-        /// <summary>
-        /// Update the product in the List
-        /// </summary>
-        /// <param name="inputList">The list imported from StoreData()</param>
-        /// <param name="productIndex">(Used with updating a product) Determines the position of the product in the list to update</param>
-        /// <param name="productObj">Product to be updated</param>
-        private static void UpdateItemInFile(List<Item> inputList, int? productIndex, Item productObj)
-        {
-            for (int i = 0; i < inputList.Count; i++)
-            {
-                if (i == productIndex)
-                {
-                    // Update product based on index in List
-                    inputList[i] = productObj;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Add a new product to the List
-        /// </summary>
-        /// <param name="inputList">The list imported from StoreData()</param>
-        /// <param name="projectObj">Product to be added</param>
-        private static void AddItemToFile(List<Item> inputList, Item projectObj)
-        {
-            inputList.Add(projectObj);
-            using (StreamWriter file = new StreamWriter(@"Data.txt", true))
-            {
-                file.WriteLine();
             }
         }
 
@@ -168,28 +115,29 @@ namespace SecureSoftwareDevelopmentProject
             isPriceValid = Regex.IsMatch(price, "^[0-9]+(\\.[0-9][0-9])?$");
         }
 
-        /// <summary>
-        /// Delete an item from the text file
-        /// </summary>
-        /// <param name="inputList">The list imported from StoreData()</param>
-        public static void DeleteItem(List<Item> inputList)
+        public  static void EncryptData(List<Item> inputList)
         {
-            int productNumber;
-            Console.WriteLine("Which item would you like to delete?");
+            AesManaged aesAlg = new AesManaged();
+            List<Item> encryptedData = inputList;
 
-            for (int i = 0; i < inputList.Count; i++)
+            try
             {
-                Console.WriteLine($"{i + 1}: {inputList[i].ItemName}");
+                using (FileStream fs = File.Open(fileLocation, FileMode.OpenOrCreate))
+                {
+                    foreach (var line in encryptedData)
+                    {
+                        CryptoStream cStream = new CryptoStream(fs, new AesManaged().CreateEncryptor(aesAlg.Key, aesAlg.IV), CryptoStreamMode.Write);
+                        StreamWriter sWriter = new StreamWriter(cStream);
+                        sWriter.WriteLine(line);
+                    }
+
+
+                }
             }
-
-            Console.Write("Your choice: ");
-            productNumber = Convert.ToInt32(Console.ReadLine());
-
-            // Remove item based on index
-            inputList.RemoveAt(productNumber - 1);
-            // Resets the variable for next use
-            productNumber = 0;
-            SaveChanges(inputList);
+            catch (CryptographicException e)
+            {
+                Console.WriteLine("A Cryptographic error occurred: {0}", e.Message);
+            }
         }
     }
 }
