@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Security.Cryptography;
 
 /*****************************************
  * File Author: Jamie Higgins
@@ -79,16 +80,24 @@ namespace SecureSoftwareDevelopmentProject
             try
             {
                 Console.WriteLine("----------------------------------------------------");
-                using (StreamWriter writer = new StreamWriter(fileLocation))
-                {
-                    foreach (var item in inputList)
-                    {
-                        writer.Write($"{item.ItemName},{item.Price},{item.Date}|");
-                    }
-                    Console.WriteLine("Changes Saved. Press any key to return to the main menu.");
-                }
+                //using (StreamWriter writer = new StreamWriter(fileLocation))
+                //{
+                //    foreach (var item in inputList)
+                //    {
+                //        writer.Write($"{item.ItemName},{item.Price},{item.Date}|");
+                //    }
+                //    Console.WriteLine("Changes Saved. Press any key to return to the main menu.");
+                //}
 
-                // Connection.EncryptData(inputList);
+                using (AesManaged myAes = new AesManaged())
+                {
+                    myAes.Padding = PaddingMode.PKCS7;
+                    myAes.KeySize = 128;          // in bits
+                    myAes.Key = new byte[128 / 8];  // 16 bytes for 128 bit encryption
+                    myAes.IV = new byte[128 / 8];   // AES needs a 16-byte IV
+                    Connection.EncryptData(inputList, myAes.Key, myAes.IV);
+                }
+                Console.WriteLine("Changes Saved. Press any key to return to the main menu.");
             }
             catch (IOException ioe)
             {
