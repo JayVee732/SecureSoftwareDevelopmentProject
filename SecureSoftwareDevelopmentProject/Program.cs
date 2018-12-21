@@ -4,7 +4,7 @@ using System.Collections.Generic;
 /*****************************************
  * File Author: Jamie Higgins
  * File Created: 17/09/2018
- * File Last Modified: 19/12/2018
+ * File Last Modified: 21/12/2018
  ****************************************/
 
 namespace SecureSoftwareDevelopmentProject
@@ -40,41 +40,50 @@ namespace SecureSoftwareDevelopmentProject
                     "5. Exit\n\n" +
                     "Your choice: ");
                 choice = Console.ReadLine();
-
-                switch (choice)
-                {
-                    case "1":
-                        Console.Clear();
-                        Console.WriteLine("View All Data\n----------------------------------------------------");
-                        ViewAllData(inputList);
-                        break;
-                    case "2":
-                        Console.Clear();
-                        Console.WriteLine("Add New Product");
-                        Connection.AddOrUpdate(inputList, true, null);
-                        break;
-                    case "3":
-                        Console.Clear();
-                        Console.WriteLine("Update a Product\n----------------------------------------------------");
-                        GetUpdateProductIndex(inputList);
-                        break;
-                    case "4":
-                        Console.Clear();
-                        Console.WriteLine("Delete a Product\n----------------------------------------------------");
-                        CRUD.DeleteItem(inputList);
-                        break;
-                    case "5":
-                        Console.Clear();
-                        Console.WriteLine("Exit\n----------------------------------------------------\nPress any key to exit the application.");
-                        break;
-                    default:
-                        Console.Write("Not a valid input. Press any key to return to the main menu.\n");
-                        break;
-                }
-
-                Console.ReadLine();
-                Console.Clear();
+                MenuSelection(inputList, choice);
             } while (choice != "5"); // User exits the application
+        }
+
+        /// <summary>
+        /// Once a selection is made on the main menu, do the action the user has selected
+        /// </summary>
+        /// <param name="inputList">The list imported from StoreData()</param>
+        /// <param name="choice">Option selected</param>
+        private static void MenuSelection(List<Item> inputList, string choice)
+        {
+            switch (choice)
+            {
+                case "1":
+                    Console.Clear();
+                    Console.WriteLine("View All Data\n----------------------------------------------------");
+                    ViewAllData(inputList);
+                    break;
+                case "2":
+                    Console.Clear();
+                    Console.WriteLine("Add New Product");
+                    CRUD.AddOrUpdate(inputList, true, null);
+                    break;
+                case "3":
+                    Console.Clear();
+                    Console.WriteLine("Update a Product\n----------------------------------------------------");
+                    GetUpdateProductIndex(inputList);
+                    break;
+                case "4":
+                    Console.Clear();
+                    Console.WriteLine("Delete a Product\n----------------------------------------------------");
+                    CRUD.DeleteItem(inputList);
+                    break;
+                case "5":
+                    Console.Clear();
+                    Console.WriteLine("Exit\n----------------------------------------------------\nPress any key to exit the application.");
+                    break;
+                default:
+                    Console.Write("Not a valid input. Press any key to return to the main menu.\n");
+                    break;
+            }
+
+            Console.ReadLine();
+            Console.Clear();
         }
 
         /// <summary>
@@ -114,7 +123,7 @@ namespace SecureSoftwareDevelopmentProject
             Console.Write("Your choice: ");
             var productIndex = Convert.ToInt32(Console.ReadLine()) - 1;
 
-            Connection.AddOrUpdate(inputList, false, productIndex);
+            CRUD.AddOrUpdate(inputList, false, productIndex);
         }
     }
 }

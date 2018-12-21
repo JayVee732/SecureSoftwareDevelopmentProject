@@ -2,31 +2,82 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
+using System.Text.RegularExpressions;
 
 /*****************************************
  * File Author: Jamie Higgins
  * File Created: 19/12/2018
- * File Last Modified: 19/12/2018
+ * File Last Modified: 21/12/2018
  ****************************************/
 
 namespace SecureSoftwareDevelopmentProject
 {
     class CRUD
     {
-        private static string fileLocation = @"Data.txt";
-
         /// <summary>
-        /// Add a new product to the List
+        /// Determines whether or not to add or update a product in the List<Item> 
         /// </summary>
         /// <param name="inputList">The list imported from StoreData()</param>
-        /// <param name="projectObj">Product to be added</param>
-        public static void AddItemToFile(List<Item> inputList, Item projectObj)
+        /// <param name="addOrUpdate">true = adding new item, false = updating an existing product</param>
+        /// <param name="productIndex">(Used with updating a product) Determines the position of the product in the list to update</param>
+        public static void AddOrUpdate(List<Item> inputList, bool addOrUpdate, int? productIndex)
         {
-            inputList.Add(projectObj);
-            using (StreamWriter file = new StreamWriter(fileLocation, true))
+            bool isPriceValid = false;
+            string product, price;
+
+            try
             {
-                file.WriteLine();
+                do
+                {
+                    ValidateProduct(out isPriceValid, out product, out price);
+                    Item productObj = new Item(product, Convert.ToDecimal(price), DateTime.Now);
+                    if (isPriceValid)
+                    {
+                        // Add new product or update existing
+                        if (addOrUpdate)
+                        {
+                            inputList.Add(productObj);
+                        }
+                        else
+                        {
+                            for (int i = 0; i < inputList.Count; i++)
+                            {
+                                if (i == productIndex)
+                                {
+                                    // Update product based on index in List
+                                    inputList[i] = productObj;
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Console.Write("Price is not valid. Please try again.");
+                    }
+                } while (!isPriceValid);
+
+                SaveChanges(inputList);
             }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Validate the product that is going to be added or updated
+        /// </summary>
+        /// <param name="isPriceValid">Does the price match the validation</param>
+        /// <param name="product">Name of the product</param>
+        /// <param name="price">price of the product</param>
+        private static void ValidateProduct(out bool isPriceValid, out string product, out string price)
+        {
+            Console.Write("----------------------------------------------------\nWhat is the name of the product?: ");
+            product = Console.ReadLine();
+            Console.Write("How much is the product?: ");
+            price = Console.ReadLine();
+            // Validate that the input for the price is in the correct format. eg. "€12.34"
+            isPriceValid = Regex.IsMatch(price, "^[0-9]+(\\.[0-9][0-9])?$");
         }
 
         /// <summary>
@@ -54,24 +105,6 @@ namespace SecureSoftwareDevelopmentProject
         }
 
         /// <summary>
-        /// Update the product in the List
-        /// </summary>
-        /// <param name="inputList">The list imported from StoreData()</param>
-        /// <param name="productIndex">(Used with updating a product) Determines the position of the product in the list to update</param>
-        /// <param name="productObj">Product to be updated</param>
-        public static void UpdateItemInFile(List<Item> inputList, int? productIndex, Item productObj)
-        {
-            for (int i = 0; i < inputList.Count; i++)
-            {
-                if (i == productIndex)
-                {
-                    // Update product based on index in List
-                    inputList[i] = productObj;
-                }
-            }
-        }
-
-        /// <summary>
         /// Save changes made to list of products to text file
         /// </summary>
         /// <param name="inputList">The list imported from StoreData()</param>
@@ -80,22 +113,13 @@ namespace SecureSoftwareDevelopmentProject
             try
             {
                 Console.WriteLine("----------------------------------------------------");
-                //using (StreamWriter writer = new StreamWriter(fileLocation))
-                //{
-                //    foreach (var item in inputList)
-                //    {
-                //        writer.Write($"{item.ItemName},{item.Price},{item.Date}|");
-                //    }
-                //    Console.WriteLine("Changes Saved. Press any key to return to the main menu.");
-                //}
-
                 using (AesManaged myAes = new AesManaged())
                 {
                     myAes.Padding = PaddingMode.PKCS7;
-                    myAes.KeySize = 128;          // in bits
-                    myAes.Key = new byte[128 / 8];  // 16 bytes for 128 bit encryption
-                    myAes.IV = new byte[128 / 8];   // AES needs a 16-byte IV
-                    Connection.EncryptData(inputList, myAes.Key, myAes.IV);
+                    myAes.KeySize = 128;           // in bits
+                    myAes.Key = new byte[128 / 8]; // 16 bytes for 128 bit encryption
+                    myAes.IV = new byte[128 / 8];  // AES needs a 16-byte IV
+                    Encryption.Encrypt(inputList, myAes.Key, myAes.IV);
                 }
                 Console.WriteLine("Changes Saved. Press any key to return to the main menu.");
             }
