@@ -30,11 +30,20 @@ namespace SecureSoftwareDevelopmentProject
                 using (StreamReader reader = File.OpenText(fileLocation))
                 {
                     string line = string.Empty;
-                    while ((line = reader.ReadLine()) != null)
+                    if ((line = reader.ReadLine()) != null)
                     {
-                        // Read each line in and add it to the List
-                        string[] itemInfo = line.Split(',');
-                        inputList.Add(new Item(itemInfo[0], Convert.ToDecimal(itemInfo[1]), Convert.ToDateTime(itemInfo[2])));
+                        // Split the text that is being read in
+                        string[] dataRead = line.Split('|');
+                        foreach (var item in dataRead)
+                        {
+                            // Check if it has reached the end of the line
+                            if (item == string.Empty)
+                            {
+                                break;
+                            }
+                            string[] itemInfo = item.Split(',');
+                            inputList.Add(new Item(itemInfo[0], Convert.ToDecimal(itemInfo[1]), Convert.ToDateTime(itemInfo[2])));
+                        }
                     }
                 }
                 return inputList;

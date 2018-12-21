@@ -83,7 +83,7 @@ namespace SecureSoftwareDevelopmentProject
                 {
                     foreach (var item in inputList)
                     {
-                        writer.WriteLine($"{item.ItemName},{item.Price},{item.Date}");
+                        writer.Write($"{item.ItemName},{item.Price},{item.Date}|");
                     }
                     Console.WriteLine("Changes Saved. Press any key to return to the main menu.");
                 }
