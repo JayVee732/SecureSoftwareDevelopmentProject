@@ -6,7 +6,7 @@ using System.Security.Cryptography;
 /*****************************************
  * File Author: Jamie Higgins
  * File Created: 31/09/2018
- * File Last Modified: 21/12/2018
+ * File Last Modified: 23/12/2018
  ****************************************/
 
 namespace SecureSoftwareDevelopmentProject
@@ -17,7 +17,7 @@ namespace SecureSoftwareDevelopmentProject
         /// Get the product from the text file
         /// </summary>
         /// <returns>The full list of items from the text file "Data.txt"</returns>
-        public static List<Item> StoreData()
+        internal static List<Item> StoreData()
         {
             try
             {
@@ -62,6 +62,32 @@ namespace SecureSoftwareDevelopmentProject
             if (!File.Exists(Common.fileLocation))
             {
                 using (var stream = File.Create(Common.fileLocation)) { }
+            }
+        }
+
+
+        /// <summary>
+        /// Save changes made to list of products to text file
+        /// </summary>
+        /// <param name="inputList">The list imported from StoreData()</param>
+        internal static void SaveChanges(List<Item> inputList)
+        {
+            try
+            {
+                Console.WriteLine("----------------------------------------------------");
+                using (AesManaged myAes = new AesManaged())
+                {
+                    myAes.Padding = PaddingMode.PKCS7;
+                    myAes.KeySize = 128;           // in bits
+                    myAes.Key = new byte[128 / 8]; // 16 bytes for 128 bit encryption
+                    myAes.IV = new byte[128 / 8];  // AES needs a 16-byte IV
+                    Encryption.Encrypt(inputList, myAes.Key, myAes.IV);
+                }
+                Console.WriteLine("Changes Saved. Press any key to return to the main menu.");
+            }
+            catch (IOException ioe)
+            {
+                Console.WriteLine($"Error: {ioe}");
             }
         }
     }

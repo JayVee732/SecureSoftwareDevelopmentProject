@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 /*****************************************
  * File Author: Jamie Higgins
  * File Created: 19/12/2018
- * File Last Modified: 21/12/2018
+ * File Last Modified: 23/12/2018
  ****************************************/
 
 namespace SecureSoftwareDevelopmentProject
@@ -20,7 +20,7 @@ namespace SecureSoftwareDevelopmentProject
         /// <param name="inputList">The list imported from StoreData()</param>
         /// <param name="addOrUpdate">true = adding new item, false = updating an existing product</param>
         /// <param name="productIndex">(Used with updating a product) Determines the position of the product in the list to update</param>
-        public static void AddOrUpdate(List<Item> inputList, bool addOrUpdate, int? productIndex)
+        internal static void AddOrUpdate(List<Item> inputList, bool addOrUpdate, int? productIndex)
         {
             bool isPriceValid = false;
             string product, price;
@@ -56,7 +56,7 @@ namespace SecureSoftwareDevelopmentProject
                     }
                 } while (!isPriceValid);
 
-                SaveChanges(inputList);
+                Connection.SaveChanges(inputList);
             }
             catch (Exception)
             {
@@ -84,7 +84,7 @@ namespace SecureSoftwareDevelopmentProject
         /// Delete an item from the text file
         /// </summary>
         /// <param name="inputList">The list imported from StoreData()</param>
-        public static void DeleteItem(List<Item> inputList)
+        internal static void DeleteItem(List<Item> inputList)
         {
             int productNumber;
             Console.WriteLine("Which item would you like to delete?");
@@ -101,32 +101,7 @@ namespace SecureSoftwareDevelopmentProject
             inputList.RemoveAt(productNumber - 1);
             // Resets the variable for next use
             productNumber = 0;
-            SaveChanges(inputList);
-        }
-
-        /// <summary>
-        /// Save changes made to list of products to text file
-        /// </summary>
-        /// <param name="inputList">The list imported from StoreData()</param>
-        public static void SaveChanges(List<Item> inputList)
-        {
-            try
-            {
-                Console.WriteLine("----------------------------------------------------");
-                using (AesManaged myAes = new AesManaged())
-                {
-                    myAes.Padding = PaddingMode.PKCS7;
-                    myAes.KeySize = 128;           // in bits
-                    myAes.Key = new byte[128 / 8]; // 16 bytes for 128 bit encryption
-                    myAes.IV = new byte[128 / 8];  // AES needs a 16-byte IV
-                    Encryption.Encrypt(inputList, myAes.Key, myAes.IV);
-                }
-                Console.WriteLine("Changes Saved. Press any key to return to the main menu.");
-            }
-            catch (IOException ioe)
-            {
-                Console.WriteLine($"Error: {ioe}");
-            }
+            Connection.SaveChanges(inputList);
         }
     }
 }
