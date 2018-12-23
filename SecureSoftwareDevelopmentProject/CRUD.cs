@@ -86,22 +86,29 @@ namespace SecureSoftwareDevelopmentProject
         /// <param name="inputList">The list imported from StoreData()</param>
         internal static void DeleteItem(List<Item> inputList)
         {
-            int productNumber;
-            Console.WriteLine("Which item would you like to delete?");
-
-            for (int i = 0; i < inputList.Count; i++)
+            if (inputList.Count != 0)
             {
-                Console.WriteLine($"{i + 1}: {inputList[i].ItemName}");
+                int productNumber;
+                Console.WriteLine("Which item would you like to delete?");
+
+                for (int i = 0; i < inputList.Count; i++)
+                {
+                    Console.WriteLine($"{i + 1}: {inputList[i].ItemName}");
+                }
+
+                Console.Write("Your choice: ");
+                productNumber = Convert.ToInt32(Console.ReadLine());
+
+                // Remove item based on index
+                inputList.RemoveAt(productNumber - 1);
+                // Resets the variable for next use
+                productNumber = 0;
+                Connection.SaveChanges(inputList);
             }
-
-            Console.Write("Your choice: ");
-            productNumber = Convert.ToInt32(Console.ReadLine());
-
-            // Remove item based on index
-            inputList.RemoveAt(productNumber - 1);
-            // Resets the variable for next use
-            productNumber = 0;
-            Connection.SaveChanges(inputList);
+            else
+            {
+                Console.WriteLine("No items are currently in the till, try adding some.");
+            }
         }
     }
 }

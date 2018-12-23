@@ -42,6 +42,8 @@ namespace SecureSoftwareDevelopmentProject
                 choice = Console.ReadLine();
                 MenuSelection(inputList, choice);
             } while (choice != "5"); // User exits the application
+
+            GC.Collect();
         }
 
         /// <summary>
@@ -113,17 +115,24 @@ namespace SecureSoftwareDevelopmentProject
         /// <param name="inputList">The list imported from StoreData()</param>
         private static void GetUpdateProductIndex(List<Item> inputList)
         {
-            Console.WriteLine("Which product would you like to update?");
-
-            for (int i = 0; i < inputList.Count; i++)
+            if (inputList.Count != 0)
             {
-                Console.WriteLine($"{i + 1}: {inputList[i].ItemName}");
+                Console.WriteLine("Which product would you like to update?");
+
+                for (int i = 0; i < inputList.Count; i++)
+                {
+                    Console.WriteLine($"{i + 1}: {inputList[i].ItemName}");
+                }
+
+                Console.Write("Your choice: ");
+                var productIndex = Convert.ToInt32(Console.ReadLine()) - 1;
+
+                CRUD.AddOrUpdate(inputList, false, productIndex);
             }
-
-            Console.Write("Your choice: ");
-            var productIndex = Convert.ToInt32(Console.ReadLine()) - 1;
-
-            CRUD.AddOrUpdate(inputList, false, productIndex);
+            else
+            {
+                Console.WriteLine("No items are currently in the till, try adding some.");
+            }
         }
     }
 }
